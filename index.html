@@ -3,29 +3,748 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Ashokan — software developer, photographer, and model. A cinematic portfolio.">
-  <meta name="theme-color" content="#050507">
-  <title>Ashokan — Software Developer, Photographer &amp; Model</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect fill='%23050507' width='32' height='32'/%3E%3Cpath d='M8 24 L16 8 L24 24' fill='none' stroke='%23FF2348' stroke-width='2'/%3E%3C/svg%3E">
+  <meta name="description" content="Ashokan is a software developer who builds digital experiences, with photography and modelling alongside the work.">
+  <meta name="theme-color" content="#070706">
+  <title>Ashokan — Software Developer</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect fill='%23050609' width='32' height='32'/%3E%3Cpath d='M7 24 L16 7 L25 24' fill='none' stroke='%23D4B06A' stroke-width='2'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <!--
-    Preview with a local server so browsers can seek the film:
-      python -m http.server 4173
-    The hero plays assets/hero_video_web.mp4 — the supplied film
-    (assets/hero_video_clean.mp4) with frequent keyframes so scroll
-    scrubbing stays responsive. The picture is unchanged.
-  -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070706;
+      --bg-2: #0e0d0b;
+      --surface: #141310;
+      --accent: #d4b06a;
+      --text: #f6f3ec;
+      --muted: #b3aa9c;
+      --line: rgba(212, 176, 106, 0.28);
+      --frame: 1240px;
+      --pad: clamp(1.15rem, 3.5vw, 2.25rem);
+      --nav: 72px;
+      --section: clamp(4.5rem, 10vh, 8rem);
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      --fast: 220ms;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { overflow-x: clip; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, "Segoe UI", sans-serif;
+      font-size: 1rem;
+      line-height: 1.6;
+      overflow-x: clip;
+    }
+    img, video { max-width: 100%; display: block; }
+    button, input, textarea { font: inherit; color: inherit; }
+    h1, h2, h3, p { margin: 0; }
+    a { color: inherit; text-decoration: none; }
+    ul { margin: 0; padding: 0; list-style: none; }
+    ::selection { background: var(--accent); color: var(--text); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+    .container {
+      width: min(var(--frame), calc(100% - var(--pad) * 2));
+      margin-inline: auto;
+    }
+    .section { padding: var(--section) 0; }
+    .section-header { max-width: 44rem; margin-bottom: clamp(2rem, 5vh, 3.5rem); }
+    .section-label, .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-bottom: 0.9rem;
+      color: var(--accent);
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .section-title, .hero-title {
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.045em;
+      line-height: 0.96;
+      text-transform: uppercase;
+    }
+    .section-title { font-size: clamp(2.2rem, 5vw, 4.4rem); max-width: 14ch; }
+    .section-description, .lede {
+      max-width: 42rem;
+      margin-top: 1rem;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.4vw, 1.12rem);
+    }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0.75rem 1.2rem;
+      border: 1px solid transparent;
+      background: var(--accent);
+      color: #16140f;
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background var(--fast) var(--ease), border-color var(--fast) var(--ease), transform var(--fast) var(--ease);
+    }
+    .button:hover { background: #e3c27a; transform: translateY(-2px); }
+    .button-ghost { background: transparent; border-color: var(--line); color: var(--text); }
+    .button-ghost:hover { border-color: var(--accent); background: transparent; }
+
+    .skip {
+      position: absolute;
+      left: 1rem;
+      top: -4rem;
+      z-index: 80;
+      background: var(--accent);
+      color: var(--bg);
+      padding: 0.5rem 0.8rem;
+    }
+    .skip:focus { top: 0.7rem; }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 40;
+      height: 2px;
+      background: transparent;
+      pointer-events: none;
+    }
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 100%;
+      background: var(--accent);
+      transform: scaleX(var(--p, 0));
+      transform-origin: left center;
+    }
+
+    .site-nav {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: var(--nav);
+      padding: 0 max(var(--pad), calc((100% - var(--frame)) / 2));
+      transition: background 240ms var(--ease), border-color 240ms var(--ease);
+      border-bottom: 1px solid transparent;
+    }
+    .site-nav.is-solid {
+      background: rgba(7, 7, 6, 0.92);
+      border-bottom-color: var(--line);
+    }
+    .brand {
+      position: relative;
+      z-index: 2;
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-size: 0.82rem;
+    }
+    .nav-links { display: flex; gap: clamp(0.7rem, 1.6vw, 1.35rem); }
+    .nav-links a {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 8px;
+      height: 1px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform var(--fast) var(--ease);
+    }
+    .nav-links a:hover::after,
+    .nav-links a[aria-current="true"]::after { transform: scaleX(1); }
+    .nav-toggle {
+      display: none;
+      position: relative;
+      z-index: 2;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+    .nav-toggle span {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      height: 1px;
+      background: var(--text);
+      transition: transform var(--fast) var(--ease);
+    }
+    .nav-toggle span:first-child { top: 18px; }
+    .nav-toggle span:last-child { top: 26px; }
+    .nav-toggle[aria-expanded="true"] span:first-child { transform: translateY(4px) rotate(40deg); }
+    .nav-toggle[aria-expanded="true"] span:last-child { transform: translateY(-4px) rotate(-40deg); }
+
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: flex-end;
+      background: var(--bg);
+      overflow: hidden;
+    }
+    .hero-video, .hero-shade, .hero-glow {
+      position: absolute;
+      inset: 0;
+    }
+    .hero-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 22%;
+      background: var(--bg) url("assets/poster.jpg") center / cover no-repeat;
+    }
+    .hero-shade {
+      background:
+        linear-gradient(90deg, rgba(7, 7, 6, 0.88) 0%, rgba(7, 7, 6, 0.55) 38%, rgba(7, 7, 6, 0.08) 62%),
+        linear-gradient(to top, rgba(7, 7, 6, 0.72), transparent 42%);
+      pointer-events: none;
+    }
+    .hero-glow {
+      background: radial-gradient(ellipse at 0% 80%, rgba(212, 176, 106, 0.2), transparent 42%);
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+    .hero-copy {
+      position: relative;
+      z-index: 2;
+      width: min(40rem, 46%);
+      margin: 0 0 clamp(2.2rem, 7vh, 4.5rem) max(var(--pad), calc((100% - var(--frame)) / 2));
+    }
+    .hero-title { font-size: clamp(2.5rem, 4.6vw, 4.5rem); max-width: 11ch; }
+    .hero-title .line { display: block; overflow: hidden; padding-bottom: 0.06em; }
+    .hero-title .line span { display: block; }
+    .hero-lead {
+      max-width: 38ch;
+      margin-top: 1.1rem;
+      color: var(--text);
+      font-size: clamp(0.98rem, 1.3vw, 1.08rem);
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.4rem; }
+    .hero-meta {
+      margin-top: 1.2rem;
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .draw {
+      display: block;
+      width: min(8rem, 40%);
+      height: 1px;
+      margin-top: 1.1rem;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+    .hero.is-ready .draw { transform: scaleX(1); transition: transform 0.9s var(--ease) 0.4s; }
+    .scroll-hint {
+      position: absolute;
+      z-index: 2;
+      right: max(var(--pad), calc((100% - var(--frame)) / 2));
+      bottom: 2rem;
+      color: var(--muted);
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .scroll-hint b {
+      display: block;
+      width: 1px;
+      height: 42px;
+      margin: 0.45rem auto 0;
+      background: linear-gradient(var(--accent), transparent);
+      transform-origin: top;
+      animation: hint 1.8s var(--ease) infinite;
+    }
+    @keyframes hint {
+      0%, 100% { transform: scaleY(0.4); }
+      50% { transform: scaleY(1); }
+    }
+    .hero-fallback {
+      position: absolute;
+      z-index: 3;
+      left: max(var(--pad), calc((100% - var(--frame)) / 2));
+      bottom: 1rem;
+      max-width: 18rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .about { background: var(--bg); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+      gap: clamp(2rem, 5vw, 5rem);
+      align-items: end;
+    }
+    .about-visual {
+      margin: 0;
+      background: var(--surface);
+      border: 1px solid var(--line);
+    }
+    .about-visual img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: center 18%; }
+    .about-visual figcaption {
+      padding: 0.75rem 0.9rem;
+      color: var(--muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .principles {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: clamp(2rem, 5vh, 3.5rem);
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--line);
+    }
+    .principles h3 {
+      margin: 0 0 0.4rem;
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: 1rem;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+    }
+    .principles p { color: var(--muted); font-size: 0.95rem; }
+
+    .skills { background: var(--bg-2); }
+    .skill-group {
+      display: grid;
+      grid-template-columns: minmax(160px, 220px) minmax(0, 1fr);
+      gap: 1rem 2rem;
+      align-items: start;
+      padding: 1.4rem 0;
+      border-top: 1px solid var(--line);
+    }
+    .skill-group:last-child { border-bottom: 1px solid var(--line); }
+    .skill-group h3 {
+      margin: 0.35rem 0 0;
+      color: var(--accent);
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .skill-list { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+    .skill {
+      position: relative;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--line);
+      background: transparent;
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: 0.95rem;
+      letter-spacing: -0.02em;
+      overflow: hidden;
+    }
+    .skill::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform var(--fast) var(--ease);
+    }
+    .skill:hover { transform: translateY(-2px); }
+    .skill:hover::after { transform: scaleX(1); }
+
+    .reel {
+      position: relative;
+      height: 420vh;
+      background: var(--bg);
+    }
+    .reel-pin {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      background: #070706;
+    }
+    .reel-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 62% center;
+      background: #070706;
+    }
+    .reel-shade {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(90deg, rgba(7, 7, 6, 0.86) 0%, rgba(7, 7, 6, 0.42) 36%, transparent 62%);
+    }
+    .reel-meter {
+      position: absolute;
+      z-index: 2;
+      top: 18vh;
+      bottom: 18vh;
+      left: max(0.8rem, calc((100% - var(--frame)) / 2 - 1.2rem));
+      width: 1px;
+      background: rgba(212, 176, 106, 0.28);
+    }
+    .reel-meter span {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: var(--accent);
+      transform: scaleY(var(--reel, 0));
+      transform-origin: top center;
+    }
+    .reel-copy {
+      position: absolute;
+      z-index: 2;
+      left: max(var(--pad), calc((100% - var(--frame)) / 2));
+      bottom: 11vh;
+      width: min(26rem, 34%);
+    }
+    .reel-copy h2 {
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-weight: 700;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      letter-spacing: -0.045em;
+      line-height: 0.96;
+      text-transform: uppercase;
+    }
+    .reel-copy p:last-child {
+      max-width: 36ch;
+      margin-top: 0.8rem;
+      color: var(--text);
+    }
+    .reel-note {
+      position: absolute;
+      z-index: 3;
+      left: max(var(--pad), calc((100% - var(--frame)) / 2));
+      top: calc(var(--nav) + 0.6rem);
+      max-width: 16rem;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .projects { background: var(--bg); }
+    .project {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: clamp(1.25rem, 3vw, 3rem);
+      align-items: center;
+      padding: clamp(1.8rem, 4vh, 3rem) 0;
+      border-top: 1px solid var(--line);
+      transition: transform var(--fast) var(--ease);
+    }
+    .project.is-reverse .project-copy { order: 2; }
+    .project:hover { transform: translateY(-4px); }
+    .project-media {
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      min-height: 280px;
+    }
+    .project-media img, .ph {
+      width: 100%;
+      height: 100%;
+      min-height: 320px;
+      object-fit: cover;
+      transition: transform 400ms var(--ease);
+    }
+    .project:hover .project-media img { transform: scale(1.04); }
+    .project-copy h3 {
+      margin: 0.35rem 0 0.8rem;
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: clamp(1.7rem, 3vw, 2.6rem);
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      line-height: 0.98;
+    }
+    .project-copy p { color: var(--muted); max-width: 46ch; }
+    .project-copy p + p { margin-top: 0.7rem; }
+    .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 1rem 0; }
+    .tags li {
+      border: 1px solid var(--line);
+      padding: 0.28rem 0.5rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .project-links { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .project-links a {
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-bottom: 1px solid transparent;
+      transition: border-color var(--fast) var(--ease);
+    }
+    .project-links a:hover { border-bottom-color: var(--accent); }
+    .project-note { margin-top: 0.8rem; color: var(--muted); font-size: 0.85rem; }
+    .project--wide { grid-template-columns: 1fr; }
+    .project--wide .project-media { min-height: 42vh; }
+    .project--wide .project-copy { max-width: 46rem; }
+    .ph {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1.2rem;
+      background:
+        linear-gradient(160deg, rgba(212, 176, 106, 0.2), transparent 46%),
+        repeating-linear-gradient(135deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 18px),
+        var(--surface);
+    }
+    .ph strong {
+      color: var(--accent);
+      font-family: "Space Grotesk", Inter, sans-serif;
+      letter-spacing: 0.16em;
+      font-size: 0.75rem;
+    }
+    .ph span { max-width: 18ch; color: var(--muted); }
+
+    .process { background: var(--bg-2); }
+    .process-list {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+    .process-list::before {
+      content: "";
+      position: absolute;
+      top: 1.55rem;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--line);
+    }
+    .process-line {
+      position: absolute;
+      top: 1.55rem;
+      left: 0;
+      height: 1px;
+      width: 100%;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left center;
+    }
+    .stage { position: relative; padding-top: 2.6rem; }
+    .stage em {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: grid;
+      place-items: center;
+      width: 2rem;
+      height: 2rem;
+      background: var(--bg-2);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-style: normal;
+      font-size: 0.75rem;
+    }
+    .stage h3 {
+      margin: 0 0 0.45rem;
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .stage p { color: var(--muted); font-size: 0.95rem; max-width: 24ch; }
+
+    .creative { background: var(--bg); }
+    .creative-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .panel {
+      position: relative;
+      min-height: 360px;
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--line);
+    }
+    .panel img { width: 100%; height: 100%; min-height: 360px; object-fit: cover; object-position: center 20%; }
+    .panel-copy {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 1.2rem;
+      background: linear-gradient(to top, rgba(7, 7, 6, 0.88), transparent);
+    }
+    .panel h3 {
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: clamp(1.4rem, 2vw, 1.8rem);
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+    }
+    .panel p { color: var(--text); max-width: 32ch; }
+
+    .contact { background: var(--bg); }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: clamp(2rem, 5vw, 5rem);
+      align-items: start;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--accent);
+    }
+    .contact-links { margin-top: 1.6rem; }
+    .contact-links a, .contact-links span {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .contact-links small { color: var(--muted); letter-spacing: 0; text-transform: none; }
+    .contact-form { display: grid; gap: 0.9rem; }
+    .field { display: grid; gap: 0.3rem; }
+    .field label { color: var(--muted); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .field input, .field textarea {
+      width: 100%;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      background: transparent;
+      padding: 0.7rem 0;
+      border-radius: 0;
+      resize: vertical;
+    }
+    .field input:focus, .field textarea:focus { outline: none; border-bottom-color: var(--accent); }
+    .form-note, .form-status { color: var(--muted); font-size: 0.88rem; max-width: 46ch; }
+    .form-status:empty { display: none; }
+
+    .site-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+      width: min(var(--frame), calc(100% - var(--pad) * 2));
+      margin: 0 auto;
+      padding: 1.2rem 0 1.8rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .to-top { color: var(--text); }
+    .to-top:hover { color: var(--accent); }
+    .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+    @media (max-width: 900px) {
+      .nav-toggle { display: block; }
+      .nav-links {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.35rem;
+        padding: calc(var(--nav) + 1rem) var(--pad);
+        background: rgba(7, 7, 6, 0.97);
+        transform: translateY(-102%);
+        transition: transform 0.4s var(--ease);
+        pointer-events: none;
+      }
+      .nav-links.is-open { transform: none; pointer-events: auto; }
+      .nav-links a { font-size: 1.2rem; }
+      .hero-copy { width: auto; max-width: none; margin: 0; padding: 0 var(--pad) 1.4rem; }
+      .hero-shade {
+        background: linear-gradient(to top, rgba(7, 7, 6, 0.94) 0%, rgba(7, 7, 6, 0.55) 42%, rgba(7, 7, 6, 0.15) 70%);
+      }
+      .scroll-hint, .reel-meter { display: none; }
+      .reel { height: 300vh; }
+      .reel-video { object-position: center 18%; }
+      .reel-shade {
+        background: linear-gradient(to top, rgba(7, 7, 6, 0.94) 0%, rgba(7, 7, 6, 0.45) 38%, transparent 68%);
+      }
+      .reel-copy {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: auto;
+        padding: 1.25rem var(--pad) calc(1.1rem + env(safe-area-inset-bottom));
+      }
+      .reel-copy h2 { font-size: clamp(1.7rem, 8vw, 2.4rem); }
+      .about-grid, .contact-grid, .creative-grid, .skill-group, .project, .project.is-reverse, .principles, .process-list {
+        grid-template-columns: 1fr;
+      }
+      .project.is-reverse .project-copy { order: 0; }
+      .project-media { order: -1; }
+      .section-title, .hero-title, .contact h2 { max-width: none; }
+      .process-list::before, .process-line { display: none; }
+      .stage { padding: 0 0 0.4rem 1rem; border-left: 1px solid var(--line); }
+      .stage em { position: static; margin-bottom: 0.55rem; }
+      .about-grid > *, .contact-grid > *, .project > *, .skill-group > * { min-width: 0; }
+    }
+
+    @media (max-width: 640px) {
+      .hero-title { font-size: clamp(2.15rem, 10vw, 3rem); }
+      .section-title { font-size: clamp(1.85rem, 8vw, 2.5rem); }
+      .hero-actions .button { width: 100%; }
+      .site-footer { flex-direction: column; align-items: flex-start; }
+      .project:hover { transform: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reel { height: auto; }
+      .reel-pin { position: relative; height: 72dvh; }
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+      .draw { transform: none; }
+    }
+  </style>
 </head>
 <body>
-  <a class="skip-link" href="#content">Skip to content</a>
+  <a class="skip" href="#content">Skip to content</a>
+  <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
 
   <header class="site-nav" id="site-nav">
     <a class="brand" href="#top">Ashokan</a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-menu">
-      <span class="sr-only">Menu</span>
+      <span class="sr">Menu</span>
       <span></span>
       <span></span>
     </button>
@@ -34,221 +753,723 @@
         <li><a href="#about">About</a></li>
         <li><a href="#skills">Skills</a></li>
         <li><a href="#projects">Projects</a></li>
-        <li><a href="#photography">Photography</a></li>
+        <li><a href="#creative">Creative</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
   </header>
 
   <main id="content">
-    <section class="cinematic" id="top" aria-label="Cinematic introduction">
-      <div class="cinematic__pin" data-side="left">
-        <div class="hero-media">
-          <video
-            id="hero-video"
-            width="1920"
-            height="1080"
-            muted
-            playsinline
-            preload="auto"
-            poster="assets/poster.jpg"
-            data-src="assets/hero_video_web.mp4"
-            data-fallback="assets/hero_video_clean.mp4"
-            aria-label="Cinematic introduction of Ashokan"></video>
-          <div class="vignette" aria-hidden="true"></div>
-          <div class="edge-light" aria-hidden="true"></div>
-          <div class="shade shade-left" aria-hidden="true"></div>
-          <div class="shade shade-right" aria-hidden="true"></div>
-          <div class="shade shade-bottom" aria-hidden="true"></div>
-          <div class="grain" aria-hidden="true"></div>
+    <section class="hero" id="top" aria-label="Introduction">
+      <!-- Plays as a normal film. It is not scrubbed by scroll. -->
+      <video
+        id="hero-video"
+        class="hero-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="auto"
+        poster="assets/poster.jpg"
+        aria-label="Cinematic introduction of Ashokan">
+        <source src="assets/hero_video_clean.mp4" type="video/mp4">
+      </video>
+      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-copy">
+        <p class="eyebrow hero-eyebrow">Software developer &amp; creative professional</p>
+        <h1 class="hero-title">
+          <span class="line"><span>I build</span></span>
+          <span class="line"><span>digital experiences.</span></span>
+        </h1>
+        <p class="hero-lead">I design and develop responsive web applications, intuitive interfaces, and reliable backend systems that turn ideas into useful digital products.</p>
+        <div class="hero-actions">
+          <a class="button" href="#projects">Explore projects</a>
+          <a class="button button-ghost" href="#contact">Contact me</a>
         </div>
-
-        <div class="hero-ui">
-          <div class="hero-progress" aria-hidden="true"><span></span></div>
-          <p class="hero-index" aria-hidden="true"><span id="scene-num">01</span><i></i><span>05</span></p>
-          <p id="hero-note" class="hero-note" hidden></p>
-
-          <article class="hero-scene is-active" data-scene="arrival" data-start="0" data-end="0.15" data-n="1" aria-hidden="false">
-            <div class="hero-copy hero-copy--left">
-              <p class="hero-eyebrow">Independent creative professional</p>
-              <h1 class="hero-title"><span class="mask"><span>Ashokan<em>.</em></span></span></h1>
-              <span class="draw-line" aria-hidden="true"></span>
-              <p class="hero-meta">Code. Create. Capture.</p>
-            </div>
-          </article>
-
-          <article class="hero-scene" data-scene="developer" data-start="0.15" data-end="0.35" data-n="2" aria-hidden="true">
-            <div class="hero-copy hero-copy--left">
-              <p class="hero-eyebrow">Developer</p>
-              <h2 class="hero-title">
-                <span class="mask"><span>I build</span></span>
-                <span class="mask"><span>digital</span></span>
-                <span class="mask"><span>experiences.</span></span>
-              </h2>
-              <p class="hero-description">From responsive interfaces to backend APIs, I turn ideas into useful, functional digital products.</p>
-              <div class="code-block">
-                <p class="code-line"><span class="tok">const</span> future = {</p>
-                <p class="code-line">&nbsp;&nbsp;design: <span class="str">"thoughtful"</span>,</p>
-                <p class="code-line">&nbsp;&nbsp;engineering: <span class="str">"reliable"</span>,</p>
-                <p class="code-line">&nbsp;&nbsp;experience: <span class="str">"exceptional"</span></p>
-                <p class="code-line">};</p>
-              </div>
-              <p class="hero-meta" id="hero-tech">HTML · CSS · JavaScript · Angular · Python · Django · REST APIs</p>
-            </div>
-          </article>
-
-          <article class="hero-scene" data-scene="photographer" data-start="0.35" data-end="0.55" data-n="3" aria-hidden="true">
-            <div class="frame-corners" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-            <div class="hero-copy hero-copy--right">
-              <div class="aperture" aria-hidden="true"><span></span></div>
-              <p class="hero-eyebrow">Photographer</p>
-              <h2 class="hero-title">
-                <span class="mask"><span>Every frame</span></span>
-                <span class="mask"><span>tells a story.</span></span>
-              </h2>
-              <span class="focus-line" aria-hidden="true"></span>
-              <p class="hero-description">Finding the right light, perspective, and detail to turn a moment into a visual experience.</p>
-              <ul class="photo-labels">
-                <li>Light</li>
-                <li>Frame</li>
-                <li>Story</li>
-              </ul>
-            </div>
-          </article>
-
-          <article class="hero-scene" data-scene="model" data-start="0.55" data-end="0.75" data-n="4" aria-hidden="true">
-            <div class="hero-copy hero-copy--left">
-              <p class="hero-eyebrow">Model</p>
-              <h2 class="hero-title">
-                <span class="mask"><span>Presence.</span></span>
-                <span class="mask"><span>Without noise.</span></span>
-              </h2>
-              <span class="draw-line" aria-hidden="true"></span>
-              <p class="hero-description">Style, confidence, and individuality — expressed through every frame.</p>
-            </div>
-          </article>
-
-          <article class="hero-scene" data-scene="signature" data-start="0.75" data-end="1" data-n="5" aria-hidden="true">
-            <div class="hero-copy hero-copy--signature">
-              <p class="hero-eyebrow">Signature</p>
-              <h2 class="hero-title">
-                <span class="mask"><span>One mind.</span></span>
-                <span class="mask"><span>Three disciplines.</span></span>
-              </h2>
-              <ul class="signature-list">
-                <li data-at="0.80">Software developer</li>
-                <li data-at="0.86">Photographer</li>
-                <li data-at="0.92">Model</li>
-              </ul>
-              <p class="hero-statement" data-at="0.95">Creating with purpose.</p>
-            </div>
-          </article>
-
-          <p class="scroll-hint"><b aria-hidden="true"></b> Scroll</p>
-        </div>
+        <p class="hero-meta">Frontend · Backend · API development</p>
+        <span class="draw" aria-hidden="true"></span>
       </div>
+      <a class="scroll-hint" href="#about"><span>Scroll</span><b aria-hidden="true"></b></a>
+      <p id="hero-fallback" class="hero-fallback" hidden></p>
     </section>
 
-    <section id="about" class="section about">
-      <div class="about__layout">
-        <div class="reveal">
-          <p class="eyebrow">About</p>
-          <h2>Beyond the frame.</h2>
-        </div>
-        <div class="about__copy reveal">
-          <span class="about__mark" aria-hidden="true"></span>
-          <p>I'm Ashokan — a software developer and creative professional interested in building digital experiences and exploring visual storytelling.</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="skills" class="section skills">
-      <div class="section__head reveal">
-        <p class="eyebrow">Skills</p>
-        <h2>What I work with.</h2>
-      </div>
-      <div id="skills-root"></div>
-    </section>
-
-    <section id="projects" class="section projects">
-      <div class="section__head reveal">
-        <p class="eyebrow">Projects</p>
-        <h2>Selected projects.</h2>
-        <p class="lede">These cards are placeholders for real work. They do not represent client projects.</p>
-      </div>
-      <div id="projects-root"></div>
-    </section>
-
-    <section id="photography" class="section gallery-section">
-      <div class="section__head reveal">
-        <p class="eyebrow">Photography</p>
-        <h2>Light, frame, story.</h2>
-        <p class="lede">A gallery for photographs. The frames below are placeholders, not published work.</p>
-      </div>
-      <div id="gallery-root" class="gallery"></div>
-    </section>
-
-    <section id="model" class="section model">
-      <div class="section__head reveal">
-        <p class="eyebrow">Model</p>
-        <h2>Presence.</h2>
-        <p class="lede">Stills from the introduction film. Replace them with selected portraits when you have a set to show.</p>
-      </div>
-      <div id="model-root"></div>
-    </section>
-
-    <section id="contact" class="section contact">
-      <div class="contact__layout">
-        <div class="reveal">
-          <p class="eyebrow">Contact</p>
-          <h2>Let's create something.</h2>
-          <ul id="contact-links" class="contact-links"></ul>
-        </div>
-        <form id="contact-form" class="contact-form reveal" novalidate>
-          <div class="field">
-            <label for="contact-name">Name</label>
-            <input id="contact-name" name="name" type="text" autocomplete="name" required>
+    <section class="section about" id="about">
+      <div class="container">
+        <div class="about-grid">
+          <div>
+            <p class="section-label">01 / About</p>
+            <h2 class="section-title">Engineering ideas into reality.</h2>
+            <p class="section-description">I'm Ashokan, a software developer focused on building modern web experiences, connecting frontend interfaces with backend services, and turning complex requirements into practical applications.</p>
+            <p class="section-description">My approach combines clean implementation, thoughtful UI, reliable API integration, and attention to the details that make products easier to use.</p>
           </div>
-          <div class="field">
-            <label for="contact-from">Your email</label>
-            <input id="contact-from" name="email" type="email" autocomplete="email" required>
+          <figure class="about-visual">
+            <img src="assets/stills/introduction-03.jpg" alt="Ashokan in a crimson jacket, a still from the introduction film" width="1600" height="900">
+            <figcaption>Still from the introduction film</figcaption>
+          </figure>
+        </div>
+        <div class="principles">
+          <article>
+            <h3>Thoughtful interfaces</h3>
+            <p>Clear layout, readable type, and interactions that stay easy to follow.</p>
+          </article>
+          <article>
+            <h3>Reliable engineering</h3>
+            <p>Interfaces, APIs, and data working together without extra noise.</p>
+          </article>
+          <article>
+            <h3>Continuous improvement</h3>
+            <p>Test what ships, fix what breaks, and refine what people actually use.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section skills" id="skills">
+      <div class="container">
+        <header class="section-header">
+          <p class="section-label">02 / Tech stack</p>
+          <h2 class="section-title">Tools for building the web.</h2>
+        </header>
+        <div id="skills-root"></div>
+      </div>
+    </section>
+
+    <section class="reel" id="build" aria-label="Development sequence">
+      <div class="reel-pin">
+        <video
+          id="reel-video"
+          class="reel-video"
+          muted
+          playsinline
+          preload="auto"
+          poster="assets/developer_intro_poster.jpg"
+          data-src="assets/developer_intro_web.mp4"
+          data-fallback="assets/developer_intro_clean.mp4"
+          aria-label="Ashokan working at a desk, advanced frame by frame as you scroll"></video>
+        <div class="reel-shade" aria-hidden="true"></div>
+        <div class="reel-meter" aria-hidden="true"><span id="reel-meter"></span></div>
+        <div class="reel-copy">
+          <p class="eyebrow" id="reel-label">03 / The build</p>
+          <h2 id="reel-title">At the desk.</h2>
+          <p id="reel-text">The work starts here — interfaces, services, and the details that hold them together.</p>
+        </div>
+        <p id="reel-note" class="reel-note" hidden></p>
+      </div>
+    </section>
+
+    <section class="section projects" id="projects">
+      <div class="container">
+        <header class="section-header">
+          <p class="section-label">04 / Selected projects</p>
+          <h2 class="section-title">Built to solve real problems.</h2>
+          <p class="section-description">Selected development work across interfaces, APIs, dashboards, and digital experiences. The entries below are placeholders until real projects are added.</p>
+        </header>
+        <div id="projects-root"></div>
+      </div>
+    </section>
+
+    <section class="section process" id="process">
+      <div class="container">
+        <header class="section-header">
+          <p class="section-label">Process</p>
+          <h2 class="section-title">From idea to implementation.</h2>
+        </header>
+        <div class="process-list">
+          <span class="process-line" aria-hidden="true"></span>
+          <article class="stage">
+            <em>01</em>
+            <h3>Understand</h3>
+            <p>Clarify requirements and the problem.</p>
+          </article>
+          <article class="stage">
+            <em>02</em>
+            <h3>Design</h3>
+            <p>Plan structure, interactions, and responsive behavior.</p>
+          </article>
+          <article class="stage">
+            <em>03</em>
+            <h3>Develop</h3>
+            <p>Build interfaces, backend endpoints, and integrations.</p>
+          </article>
+          <article class="stage">
+            <em>04</em>
+            <h3>Refine</h3>
+            <p>Test functionality, fix issues, and improve usability.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section creative" id="creative">
+      <div class="container">
+        <header class="section-header">
+          <p class="section-label">05 / Beyond code</p>
+          <h2 class="section-title">A technical mind. A creative eye.</h2>
+          <p class="section-description">Outside software development, I explore photography, visual composition, and personal style.</p>
+        </header>
+        <div class="creative-grid">
+          <article class="panel">
+            <div class="ph" style="min-height:360px">
+              <strong>Photography</strong>
+              <span>Replace this frame with a photograph. Nothing here is published client work.</span>
+            </div>
+            <div class="panel-copy">
+              <h3>Photography</h3>
+              <p>Light, composition, and visual storytelling.</p>
+            </div>
+          </article>
+          <article class="panel">
+            <img src="assets/stills/model-studio.jpg" alt="Ashokan in a studio, a still from the introduction film" width="1600" height="900">
+            <div class="panel-copy">
+              <h3>Model</h3>
+              <p>Style, presence, and self-expression. Still from the introduction film.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section contact" id="contact">
+      <div class="container">
+        <div class="contact-grid">
+          <div>
+            <p class="section-label">06 / Contact</p>
+            <h2 class="section-title">Let's build something meaningful.</h2>
+            <p class="section-description">Have a project, collaboration, or development opportunity in mind? Let's talk.</p>
+            <ul id="contact-links" class="contact-links"></ul>
           </div>
-          <div class="field">
-            <label for="contact-message">Message</label>
-            <textarea id="contact-message" name="message" rows="4" required></textarea>
-          </div>
-          <button class="send" type="submit">Open in email</button>
-          <p id="form-note" class="form-note"></p>
-          <p id="form-status" class="form-status" role="status"></p>
-        </form>
+          <form id="contact-form" class="contact-form" novalidate>
+            <div class="field">
+              <label for="contact-name">Name</label>
+              <input id="contact-name" name="name" type="text" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="contact-from">Your email</label>
+              <input id="contact-from" name="email" type="email" autocomplete="email" required>
+            </div>
+            <div class="field">
+              <label for="contact-message">Message</label>
+              <textarea id="contact-message" name="message" rows="4" required></textarea>
+            </div>
+            <button class="button" type="submit">Open in email</button>
+            <p id="form-note" class="form-note"></p>
+            <p id="form-status" class="form-status" role="status"></p>
+          </form>
+        </div>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <span>Ashokan</span>
-    <span>Software developer, photographer, and model</span>
+    <span>Ashokan — software developer</span>
+    <a class="to-top" href="#top">Back to top</a>
   </footer>
 
-  <dialog id="lightbox" aria-label="Image viewer">
-    <div class="lightbox__bar">
-      <p class="lightbox__count"></p>
-      <button type="button" class="lightbox__close" data-close>Close</button>
-    </div>
-    <div class="lightbox__stage">
-      <button type="button" class="lightbox__nav" data-prev aria-label="Previous image">Prev</button>
-      <div class="lightbox__frame"></div>
-      <button type="button" class="lightbox__nav" data-next aria-label="Next image">Next</button>
-    </div>
-    <p class="lightbox__caption"></p>
-  </dialog>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+  <script>
+    /* Edit this object to change skills, projects, and contact links.
+       Leave a URL empty until it is a real address. */
+    const DATA = {
+      skills: [
+        { label: "Frontend", items: ["HTML5", "CSS3", "JavaScript", "TypeScript", "Angular", "Bootstrap", "Responsive UI", "REST API integration"] },
+        { label: "Backend", items: ["Python", "Django", "Django REST Framework", "REST API development", "Authentication", "API validation"] },
+        { label: "Databases", items: ["MySQL", "PostgreSQL", "MongoDB"] },
+        { label: "Developer tools", items: ["Git", "GitHub", "Postman", "Swagger / OpenAPI", "VS Code", "Browser DevTools"] }
+      ],
+      projects: [
+        {
+          title: "Angular web application",
+          problem: "Placeholder. Replace this with the problem a real interface needed to solve.",
+          solution: "A space for an Angular application. This card does not represent shipped client work.",
+          stack: ["Angular", "TypeScript", "HTML", "CSS"],
+          image: "",
+          demo: "",
+          code: "",
+          wide: false
+        },
+        {
+          title: "Django REST API",
+          problem: "Placeholder. Describe the data or workflow the API needed to support.",
+          solution: "A space for a Django and Django REST Framework project. No repository is linked yet.",
+          stack: ["Python", "Django", "Django REST Framework"],
+          image: "",
+          demo: "",
+          code: "",
+          wide: false
+        },
+        {
+          title: "Product dashboard",
+          problem: "Placeholder for a wider build such as a dashboard, shop, auth flow, or internal tool.",
+          solution: "Add the real screenshot, problem, and links here when the work is ready to show.",
+          stack: ["JavaScript", "REST APIs", "PostgreSQL"],
+          image: "",
+          demo: "",
+          code: "",
+          wide: true
+        }
+      ],
+      contact: {
+        email: "",
+        github: "",
+        linkedin: "",
+        other: ""
+      }
+    };
 
-  <noscript>
-    <p class="noscript-note">JavaScript is disabled, so the film will not follow the scroll and the skill, project, and gallery lists stay empty. The introduction text above is still readable.</p>
-  </noscript>
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="script.js" defer></script>
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+      }[char]));
+    }
+
+    function safeUrl(url) {
+      if (!url) return "";
+      try {
+        const parsed = new URL(url, window.location.href);
+        if (parsed.protocol === "http:" || parsed.protocol === "https:" || parsed.protocol === "mailto:") return parsed.href;
+      } catch (error) { return ""; }
+      return "";
+    }
+
+    function renderSkills() {
+      const root = document.getElementById("skills-root");
+      root.replaceChildren();
+      DATA.skills.forEach((group) => {
+        const row = document.createElement("article");
+        row.className = "skill-group";
+        const items = group.items.map((item) => `<li class="skill">${escapeHtml(item)}</li>`).join("");
+        row.innerHTML = `<h3>${escapeHtml(group.label)}</h3><ul class="skill-list">${items}</ul>`;
+        root.appendChild(row);
+      });
+    }
+
+    function renderProjects() {
+      const root = document.getElementById("projects-root");
+      root.replaceChildren();
+      DATA.projects.forEach((project, index) => {
+        const article = document.createElement("article");
+        article.className = `project${project.wide ? " project--wide" : ""}${!project.wide && index % 2 ? " is-reverse" : ""}`;
+        const media = document.createElement("div");
+        media.className = "project-media";
+        const image = safeUrl(project.image);
+        if (image) {
+          const img = document.createElement("img");
+          img.src = image;
+          img.alt = project.title;
+          img.loading = "lazy";
+          media.appendChild(img);
+        } else {
+          media.innerHTML = `<div class="ph"><strong>Placeholder</strong><span>Add a project screenshot</span></div>`;
+        }
+        const demo = safeUrl(project.demo);
+        const code = safeUrl(project.code);
+        const links = [
+          demo ? `<a href="${escapeHtml(demo)}" target="_blank" rel="noopener noreferrer">Live demo</a>` : "",
+          code ? `<a href="${escapeHtml(code)}" target="_blank" rel="noopener noreferrer">Source</a>` : ""
+        ].filter(Boolean).join("");
+        const copy = document.createElement("div");
+        copy.className = "project-copy";
+        copy.innerHTML = `
+          <p class="eyebrow">0${index + 1}</p>
+          <h3>${escapeHtml(project.title)}</h3>
+          <p>${escapeHtml(project.problem)}</p>
+          <p>${escapeHtml(project.solution)}</p>
+          <ul class="tags">${(project.stack || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+          ${links ? `<div class="project-links">${links}</div>` : `<p class="project-note">Demo and source links have not been added.</p>`}
+        `;
+        article.append(media, copy);
+        root.appendChild(article);
+      });
+    }
+
+    function renderContact() {
+      const list = document.getElementById("contact-links");
+      const note = document.getElementById("form-note");
+      const email = (DATA.contact.email || "").trim();
+      const rows = [
+        { label: "Email", href: email ? `mailto:${email}` : "", value: email || "Not added yet" },
+        { label: "GitHub", href: safeUrl(DATA.contact.github), value: DATA.contact.github || "Not added yet" },
+        { label: "LinkedIn", href: safeUrl(DATA.contact.linkedin), value: DATA.contact.linkedin || "Not added yet" },
+        { label: "Other", href: safeUrl(DATA.contact.other), value: DATA.contact.other || "Not added yet" }
+      ];
+      list.replaceChildren();
+      rows.forEach((row) => {
+        const li = document.createElement("li");
+        const display = row.href && !row.href.startsWith("mailto:") ? row.href.replace(/^https?:\/\//, "") : row.value;
+        if (row.href) {
+          const anchor = document.createElement("a");
+          anchor.href = row.href;
+          if (!row.href.startsWith("mailto:")) { anchor.target = "_blank"; anchor.rel = "noopener noreferrer"; }
+          anchor.innerHTML = `<span>${escapeHtml(row.label)}</span><small>${escapeHtml(display)}</small>`;
+          li.appendChild(anchor);
+        } else {
+          li.innerHTML = `<span><span>${escapeHtml(row.label)}</span><small>${escapeHtml(row.value)}</small></span>`;
+        }
+        list.appendChild(li);
+      });
+      note.textContent = email
+        ? "This form has no server. Submitting opens your email app with a draft. The site does not send or store the message."
+        : "Add your email in the DATA.contact object in this file. Until then, nothing is sent.";
+    }
+
+    function initNav() {
+      const header = document.getElementById("site-nav");
+      const toggle = header.querySelector(".nav-toggle");
+      const links = document.querySelector(".nav-links");
+      const anchors = [...links.querySelectorAll("a")];
+      const setOpen = (open) => {
+        toggle.setAttribute("aria-expanded", open ? "true" : "false");
+        links.classList.toggle("is-open", open);
+      };
+      toggle.addEventListener("click", () => setOpen(toggle.getAttribute("aria-expanded") !== "true"));
+      anchors.forEach((anchor) => anchor.addEventListener("click", () => setOpen(false)));
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") setOpen(false);
+      });
+      const onScroll = () => header.classList.toggle("is-solid", window.scrollY > 24);
+      onScroll();
+      window.addEventListener("scroll", onScroll, { passive: true });
+      const sections = anchors.map((anchor) => document.querySelector(anchor.getAttribute("href"))).filter(Boolean);
+      if ("IntersectionObserver" in window) {
+        const spy = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            anchors.forEach((anchor) => {
+              if (anchor.getAttribute("href") === `#${entry.target.id}`) anchor.setAttribute("aria-current", "true");
+              else anchor.removeAttribute("aria-current");
+            });
+          });
+        }, { rootMargin: "-45% 0px -45% 0px" });
+        sections.forEach((section) => spy.observe(section));
+      }
+    }
+
+    /* Hero film: normal playback. Scroll does not seek the video. */
+    function initVideo() {
+      const video = document.getElementById("hero-video");
+      const note = document.getElementById("hero-fallback");
+      const hero = document.querySelector(".hero");
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
+      const play = () => {
+        const attempt = video.play();
+        if (attempt && typeof attempt.catch === "function") {
+          attempt.catch(() => {
+            video.controls = true;
+            note.hidden = false;
+            note.textContent = "Press play on the film if it does not start on its own.";
+          });
+        }
+      };
+      video.addEventListener("canplay", play);
+      video.addEventListener("loadeddata", play);
+      video.addEventListener("error", () => {
+        note.hidden = false;
+        note.textContent = "The introduction film could not be loaded. The rest of the page still works.";
+      });
+      if (video.readyState >= 2) play();
+      hero.classList.add("is-ready");
+    }
+
+    function initContactForm() {
+      const form = document.getElementById("contact-form");
+      const status = document.getElementById("form-status");
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const email = (DATA.contact.email || "").trim();
+        const name = form.name.value.trim();
+        const from = form.email.value.trim();
+        const message = form.message.value.trim();
+        if (!name || !from || !message) {
+          status.textContent = "Add your name, email, and a message before opening a draft.";
+          return;
+        }
+        if (!email) {
+          status.textContent = "No destination email is set in this file. Nothing was sent.";
+          return;
+        }
+        const subject = encodeURIComponent(`Portfolio note from ${name}`);
+        const body = encodeURIComponent(`Name: ${name}\nEmail: ${from}\n\n${message}`);
+        window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        status.textContent = "Your email app should open with this draft. This website does not send or store the message.";
+      });
+    }
+
+    /* Section 03: scroll moves developer_intro frame by frame. The hero film above still plays on its own. */
+    function initReel() {
+      const section = document.getElementById("build");
+      const video = document.getElementById("reel-video");
+      const title = document.getElementById("reel-title");
+      const text = document.getElementById("reel-text");
+      const note = document.getElementById("reel-note");
+      const meter = document.getElementById("reel-meter");
+      if (!section || !video) return;
+
+      const beats = [
+        { at: 0, title: "At the desk.", text: "The work starts here — interfaces, services, and the details that hold them together." },
+        { at: 0.28, title: "The stack.", text: "Angular, TypeScript, and Python, used where a product needs both a clear screen and a reliable service." },
+        { at: 0.55, title: "The interface.", text: "Structure, feedback, and layout that stay readable while the system does the heavy work." },
+        { at: 0.78, title: "Software, first.", text: "Development is the center of the work. Photography and modelling sit beside it." }
+      ];
+
+      const scrub = { duration: 0, target: 0, seeking: false, ready: false, raf: 0, stamp: 0, mode: "fine" };
+      const fine = window.matchMedia("(min-width: 900px) and (pointer: fine)");
+      const threshold = () => (scrub.mode === "coarse" || !fine.matches ? 0.14 : 0.045);
+
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
+      video.preload = "auto";
+
+      function showNote(message) {
+        note.hidden = false;
+        note.textContent = message;
+      }
+
+      function applyBeat(progress) {
+        let current = beats[0];
+        beats.forEach((beat) => { if (progress >= beat.at) current = beat; });
+        if (title.textContent !== current.title) title.textContent = current.title;
+        if (text.textContent !== current.text) text.textContent = current.text;
+        if (meter) meter.style.setProperty("--reel", progress.toFixed(4));
+      }
+
+      function queueSeek() {
+        if (!scrub.ready || scrub.mode === "off" || reducedMotion || document.hidden) return false;
+        if (scrub.seeking) {
+          if (performance.now() - scrub.stamp > 1400) scrub.seeking = false;
+          else return true;
+        }
+        if (Math.abs(video.currentTime - scrub.target) < threshold()) return false;
+        const next = Math.min(Math.max(scrub.target, 0), Math.max(scrub.duration - 0.04, 0));
+        scrub.seeking = true;
+        scrub.stamp = performance.now();
+        try { video.currentTime = next; }
+        catch (error) {
+          scrub.mode = "off";
+          scrub.seeking = false;
+          video.controls = true;
+          showNote("This browser cannot step through the film. You can still play it. Scrolling still changes the lines.");
+          return false;
+        }
+        return true;
+      }
+
+      function scheduleSeek() {
+        if (scrub.raf) return;
+        scrub.raf = requestAnimationFrame(() => {
+          scrub.raf = 0;
+          if (queueSeek()) scheduleSeek();
+        });
+      }
+
+      video.addEventListener("loadedmetadata", () => {
+        if (!Number.isFinite(video.duration) || video.duration <= 0) return;
+        scrub.duration = video.duration;
+        scrub.ready = true;
+        video.pause();
+        scheduleSeek();
+      });
+      video.addEventListener("seeked", () => {
+        const slow = performance.now() - scrub.stamp > 550;
+        scrub.seeking = false;
+        if (slow && scrub.mode === "fine") {
+          scrub.mode = "coarse";
+          showNote("Frame stepping is slower here, so the film moves in shorter jumps as you scroll.");
+        }
+        if (Math.abs(video.currentTime - scrub.target) > threshold()) scheduleSeek();
+      });
+      video.addEventListener("play", () => {
+        if (scrub.mode !== "off" && !reducedMotion) video.pause();
+      });
+      video.addEventListener("error", () => {
+        if (video.dataset.usingFallback || !video.dataset.fallback) {
+          scrub.mode = "off";
+          showNote("The development film could not be loaded. The rest of the page still works.");
+          return;
+        }
+        video.dataset.usingFallback = "1";
+        loadSeekable(video.dataset.fallback);
+      });
+
+      /* Fetch the whole clip first. A static server without byte ranges leaves the film unseekable, so scroll cannot change the frame. */
+      function loadSeekable(url) {
+        fetch(url)
+          .then((response) => {
+            if (!response.ok) throw new Error("film");
+            return response.blob();
+          })
+          .then((blob) => {
+            const local = URL.createObjectURL(blob);
+            video.src = local;
+            video.load();
+          })
+          .catch(() => {
+            if (url !== video.dataset.fallback && video.dataset.fallback) {
+              video.dataset.usingFallback = "1";
+              loadSeekable(video.dataset.fallback);
+              return;
+            }
+            video.src = url;
+            video.load();
+          });
+      }
+
+      if (video.dataset.src) loadSeekable(video.dataset.src);
+
+      function onProgress(progress) {
+        const clamped = Math.min(1, Math.max(0, progress || 0));
+        applyBeat(clamped);
+        if (!scrub.ready || scrub.mode === "off" || reducedMotion) return;
+        const end = Math.max(scrub.duration - 0.04, 0);
+        scrub.target = clamped >= 0.995 ? end : clamped * end;
+        scheduleSeek();
+      }
+
+      function measure() {
+        const total = section.offsetHeight - window.innerHeight;
+        if (total <= 0) return 0;
+        return Math.min(1, Math.max(0, -section.getBoundingClientRect().top / total));
+      }
+
+      if (reducedMotion) {
+        video.controls = true;
+        video.pause();
+        applyBeat(0);
+        return;
+      }
+
+      if (window.gsap && window.ScrollTrigger) {
+        gsap.registerPlugin(ScrollTrigger);
+        ScrollTrigger.create({
+          trigger: section,
+          start: "top top",
+          end: "bottom bottom",
+          onUpdate: (self) => onProgress(self.progress),
+          onRefresh: (self) => onProgress(self.progress)
+        });
+      } else {
+        const onScroll = () => onProgress(measure());
+        window.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("resize", onScroll);
+        onScroll();
+      }
+    }
+
+    function initProgress() {
+      const bar = document.getElementById("progress-bar");
+      const update = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const value = max > 0 ? window.scrollY / max : 0;
+        bar.style.setProperty("--p", String(Math.min(1, Math.max(0, value))));
+        document.querySelector(".progress").style.setProperty("--p", String(Math.min(1, Math.max(0, value))));
+      };
+      update();
+      window.addEventListener("scroll", update, { passive: true });
+      window.addEventListener("resize", update);
+    }
+
+    /* Section motion. Content stays visible if GSAP never loads. */
+    function initMotion() {
+      if (!window.gsap || !window.ScrollTrigger || reducedMotion) return;
+      gsap.registerPlugin(ScrollTrigger);
+      const mm = gsap.matchMedia();
+
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        let lenis;
+        let ticker;
+        if (window.Lenis) {
+          lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
+          lenis.on("scroll", ScrollTrigger.update);
+          ticker = (time) => lenis.raf(time * 1000);
+          gsap.ticker.add(ticker);
+          gsap.ticker.lagSmoothing(0);
+        }
+
+        const hero = gsap.timeline({ defaults: { ease: "power3.out" } });
+        hero
+          .from(".site-nav", { autoAlpha: 0, y: -16, duration: 0.6 })
+          .from(".hero-eyebrow", { autoAlpha: 0, y: 14, duration: 0.5 }, "-=0.25")
+          .from(".hero-title .line span", { yPercent: 110, duration: 0.8, stagger: 0.12 }, "-=0.2")
+          .from(".hero-lead", { autoAlpha: 0, y: 16, duration: 0.55 }, "-=0.35")
+          .from(".hero-actions .button", { autoAlpha: 0, y: 12, duration: 0.4, stagger: 0.08 }, "-=0.25")
+          .from(".hero-meta", { autoAlpha: 0, duration: 0.4 }, "-=0.15");
+
+        gsap.utils.toArray(".section-title, .section-description, .principles article, .stage").forEach((node, index) => {
+          gsap.from(node, {
+            y: 28,
+            autoAlpha: 0,
+            duration: 0.75,
+            delay: (index % 4) * 0.05,
+            scrollTrigger: { trigger: node, start: "top 88%" }
+          });
+        });
+
+        gsap.utils.toArray(".skill").forEach((node, index) => {
+          gsap.from(node, {
+            y: 16,
+            autoAlpha: 0,
+            duration: 0.45,
+            delay: (index % 6) * 0.04,
+            scrollTrigger: { trigger: node, start: "top 92%" }
+          });
+        });
+
+        gsap.utils.toArray(".project-media").forEach((node) => {
+          gsap.from(node, {
+            clipPath: "inset(10% 8% 10% 8%)",
+            duration: 0.9,
+            ease: "power2.out",
+            scrollTrigger: { trigger: node, start: "top 84%" }
+          });
+        });
+
+        gsap.from(".process-line", {
+          scaleX: 0,
+          duration: 1,
+          ease: "power2.out",
+          scrollTrigger: { trigger: ".process-list", start: "top 80%" }
+        });
+
+        gsap.from(".contact-grid", {
+          y: 24,
+          autoAlpha: 0,
+          duration: 0.8,
+          scrollTrigger: { trigger: ".contact", start: "top 82%" }
+        });
+
+        mm.add("(min-width: 901px)", () => {
+          gsap.utils.toArray(".project-media img, .about-visual img, .panel img").forEach((image) => {
+            gsap.fromTo(image, { yPercent: -4 }, {
+              yPercent: 4,
+              ease: "none",
+              scrollTrigger: { trigger: image.parentElement, start: "top bottom", end: "bottom top", scrub: true }
+            });
+          });
+        });
+
+        return () => {
+          if (ticker) gsap.ticker.remove(ticker);
+          if (lenis) lenis.destroy();
+        };
+      });
+    }
+
+    renderSkills();
+    renderProjects();
+    renderContact();
+    initNav();
+    initVideo();
+    initReel();
+    initContactForm();
+    initProgress();
+    initMotion();
+  </script>
 </body>
 </html>

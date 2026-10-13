@@ -138,7 +138,7 @@ function renderProjects() {
   root.replaceChildren();
   CONFIG.projects.forEach((project, index) => {
     const article = document.createElement("article");
-    article.className = `project reveal${index % 2 ? " is-flip" : ""}`;
+    article.className = "project reveal";
     const media = document.createElement("div");
     media.className = "project__media";
     const imageUrl = safeUrl(project.image);
@@ -307,7 +307,12 @@ function initReveals() {
       observer.unobserve(entry.target);
     });
   }, { threshold: 0.18 });
-  nodes.forEach((node) => observer.observe(node));
+  nodes.forEach((node) => {
+    const siblings = [...node.parentElement.querySelectorAll(":scope > .reveal")];
+    const index = Math.max(0, siblings.indexOf(node));
+    node.style.transitionDelay = `${Math.min(index, 8) * 80}ms`;
+    observer.observe(node);
+  });
 }
 
 function initNav() {
@@ -461,18 +466,12 @@ function initContactForm() {
 }
 
 function bandOpacity(progress, start, end) {
-  const fade = 0.04;
-  if (progress < start) {
-    if (start === 0) return 1;
-    if (progress <= start - fade) return 0;
-    return (progress - (start - fade)) / fade;
-  }
-  if (progress > end) {
-    if (end >= 1) return 1;
-    if (progress >= end + fade) return 0;
-    return 1 - (progress - end) / fade;
-  }
-  return 1;
+  const fade = 0.1;
+  const clamp01 = (value) => Math.min(1, Math.max(0, value));
+  let value = 1;
+  if (start > 0) value = Math.min(value, clamp01((progress - (start - fade / 2)) / fade));
+  if (end < 1) value = Math.min(value, clamp01(1 - (progress - (end - fade / 2)) / fade));
+  return value;
 }
 
 function measureProgress() {
@@ -667,10 +666,63 @@ function initHero() {
     });
   }
 
+  const shown = new Map();
+  let paintRaf = 0;
+  let latestProgress = 0;
+
+  function paintScenes(clamped) {
+    let moving = false;
+    let best = clamped >= 0.75 ? 5 : 1;
+    let bestOpacity = 0.04;
+    let bestScene = scenes[0];
+    scenes.forEach((scene, index) => {
+      const start = Number(scene.dataset.start);
+      const end = Number(scene.dataset.end);
+      let target = bandOpacity(clamped, start, end);
+      if (scene.dataset.scene === "signature" && clamped > 0.94) {
+        target *= Math.max(0, 1 - (clamped - 0.94) / 0.06);
+      }
+      const current = shown.get(scene) ?? target;
+      let next = current + (target - current) * 0.18;
+      if (Math.abs(target - next) < 0.01) next = target;
+      else moving = true;
+      shown.set(scene, next);
+      scene.style.opacity = next.toFixed(3);
+      scene.style.visibility = next > 0.02 ? "visible" : "hidden";
+      const wasActive = scene.classList.contains("is-active");
+      const active = next > 0.46 || (wasActive && next > 0.2);
+      scene.classList.toggle("is-active", active);
+      scene.setAttribute("aria-hidden", active ? "false" : "true");
+      if (next > bestOpacity) {
+        bestOpacity = next;
+        best = Number(scene.dataset.n) || index + 1;
+        bestScene = scene;
+      }
+    });
+
+    const label = String(best).padStart(2, "0");
+    if (sceneNum.textContent !== label) sceneNum.textContent = label;
+    const side = clamped >= 0.96 ? "none" : (bestScene?.dataset.side || "left");
+    if (pin.dataset.side !== side) pin.dataset.side = side;
+    beats.forEach((beat) => {
+      beat.classList.toggle("is-on", clamped >= Number(beat.dataset.at));
+    });
+    return moving;
+  }
+
+  function schedulePaint() {
+    if (paintRaf) return;
+    paintRaf = requestAnimationFrame(() => {
+      paintRaf = 0;
+      if (paintScenes(latestProgress)) schedulePaint();
+    });
+  }
+
   function applyProgress(progress) {
     const clamped = Math.min(1, Math.max(0, progress || 0));
+    latestProgress = clamped;
     pin.style.setProperty("--p", clamped.toFixed(4));
-    pin.classList.toggle("is-intro", clamped < 0.12);
+    pin.classList.toggle("is-intro", clamped < 0.1);
 
     if (scrub.ready && scrub.mode !== "off" && !prefersReduced()) {
       const end = Math.max(scrub.duration - 0.04, 0);
@@ -678,44 +730,7 @@ function initHero() {
       scheduleSeek();
     }
 
-    let best = clamped >= 0.75 ? 5 : 1;
-    let bestOpacity = 0.03;
-    const shift = !prefersReduced() && window.matchMedia("(min-width: 800px)").matches;
-    scenes.forEach((scene, index) => {
-      const start = Number(scene.dataset.start);
-      const end = Number(scene.dataset.end);
-      let opacity = bandOpacity(clamped, start, end);
-      if (scene.dataset.scene === "signature" && clamped > 0.94) {
-        opacity *= Math.max(0, 1 - (clamped - 0.94) / 0.06);
-      }
-      scene.style.opacity = opacity.toFixed(3);
-      scene.style.visibility = opacity > 0.02 ? "visible" : "hidden";
-      const active = opacity > 0.5;
-      scene.classList.toggle("is-active", active);
-      scene.setAttribute("aria-hidden", active ? "false" : "true");
-      if (opacity > bestOpacity) {
-        bestOpacity = opacity;
-        best = Number(scene.dataset.n) || index + 1;
-      }
-      const copy = scene.querySelector(".hero-copy");
-      if (copy && shift) {
-        const local = (clamped - start) / Math.max(end - start, 0.001);
-        copy.style.transform = opacity > 0.02 ? `translate3d(0, ${((0.5 - local) * 16).toFixed(2)}px, 0)` : "";
-      }
-    });
-
-    const label = String(best).padStart(2, "0");
-    if (sceneNum.textContent !== label) sceneNum.textContent = label;
-
-    let side = "left";
-    if (clamped >= 0.35 && clamped < 0.55) side = "right";
-    else if (clamped >= 0.75 && clamped < 0.96) side = "bottom";
-    else if (clamped >= 0.96) side = "none";
-    if (pin.dataset.side !== side) pin.dataset.side = side;
-
-    beats.forEach((beat) => {
-      beat.classList.toggle("is-on", clamped >= Number(beat.dataset.at));
-    });
+    schedulePaint();
   }
 
   function staticHero() {
@@ -747,23 +762,28 @@ function initHero() {
       staticHero();
     });
     mm.add("(prefers-reduced-motion: no-preference)", () => {
+      let scrollRaf = 0;
+      const sync = () => {
+        if (scrollRaf) return;
+        scrollRaf = requestAnimationFrame(() => {
+          scrollRaf = 0;
+          applyProgress(measureProgress());
+        });
+      };
       const trigger = window.ScrollTrigger.create({
         trigger: ".cinematic",
         start: "top top",
         end: "bottom bottom",
-        onUpdate: (self) => applyProgress(self.progress),
-        onRefresh: (self) => applyProgress(self.progress)
+        onUpdate: sync,
+        onRefresh: sync
       });
-      let resizeTimer = 0;
-      const onResize = () => {
-        window.clearTimeout(resizeTimer);
-        resizeTimer = window.setTimeout(() => window.ScrollTrigger.refresh(), 150);
-      };
-      window.addEventListener("resize", onResize);
-      applyProgress(trigger.progress || 0);
+      window.addEventListener("scroll", sync, { passive: true });
+      window.addEventListener("resize", sync);
+      sync();
       return () => {
-        window.removeEventListener("resize", onResize);
-        window.clearTimeout(resizeTimer);
+        window.removeEventListener("scroll", sync);
+        window.removeEventListener("resize", sync);
+        if (scrollRaf) cancelAnimationFrame(scrollRaf);
         if (scrub.raf) cancelAnimationFrame(scrub.raf);
         scrub.raf = 0;
         trigger.kill();
