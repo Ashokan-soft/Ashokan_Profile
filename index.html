@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Ashokan — software developer, photographer, and model. A cinematic portfolio.">
+  <meta name="theme-color" content="#050507">
+  <title>Ashokan — Software Developer, Photographer &amp; Model</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect fill='%23050507' width='32' height='32'/%3E%3Cpath d='M8 24 L16 8 L24 24' fill='none' stroke='%23FF2348' stroke-width='2'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!--
+    Preview with a local server so browsers can seek the film:
+      python -m http.server 4173
+    The hero plays assets/hero_video_web.mp4 — the supplied film
+    (assets/hero_video_clean.mp4) with frequent keyframes so scroll
+    scrubbing stays responsive. The picture is unchanged.
+  -->
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+
+  <header class="site-nav" id="site-nav">
+    <a class="brand" href="#top">Ashokan</a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-menu">
+      <span class="sr-only">Menu</span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav id="site-menu" aria-label="Primary">
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#photography">Photography</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="content">
+    <section class="cinematic" id="top" aria-label="Cinematic introduction">
+      <div class="cinematic__pin" data-side="left">
+        <div class="hero-media">
+          <video
+            id="hero-video"
+            width="1920"
+            height="1080"
+            muted
+            playsinline
+            preload="auto"
+            poster="assets/poster.jpg"
+            data-src="assets/hero_video_web.mp4"
+            data-fallback="assets/hero_video_clean.mp4"
+            aria-label="Cinematic introduction of Ashokan"></video>
+          <div class="vignette" aria-hidden="true"></div>
+          <div class="edge-light" aria-hidden="true"></div>
+          <div class="shade shade-left" aria-hidden="true"></div>
+          <div class="shade shade-right" aria-hidden="true"></div>
+          <div class="shade shade-bottom" aria-hidden="true"></div>
+          <div class="grain" aria-hidden="true"></div>
+        </div>
+
+        <div class="hero-ui">
+          <div class="hero-progress" aria-hidden="true"><span></span></div>
+          <p class="hero-index" aria-hidden="true"><span id="scene-num">01</span><i></i><span>05</span></p>
+          <p id="hero-note" class="hero-note" hidden></p>
+
+          <article class="hero-scene is-active" data-scene="arrival" data-start="0" data-end="0.15" data-n="1" aria-hidden="false">
+            <div class="hero-copy hero-copy--left">
+              <p class="hero-eyebrow">Independent creative professional</p>
+              <h1 class="hero-title"><span class="mask"><span>Ashokan<em>.</em></span></span></h1>
+              <span class="draw-line" aria-hidden="true"></span>
+              <p class="hero-meta">Code. Create. Capture.</p>
+            </div>
+          </article>
+
+          <article class="hero-scene" data-scene="developer" data-start="0.15" data-end="0.35" data-n="2" aria-hidden="true">
+            <div class="hero-copy hero-copy--left">
+              <p class="hero-eyebrow">Developer</p>
+              <h2 class="hero-title">
+                <span class="mask"><span>I build</span></span>
+                <span class="mask"><span>digital</span></span>
+                <span class="mask"><span>experiences.</span></span>
+              </h2>
+              <p class="hero-description">From responsive interfaces to backend APIs, I turn ideas into useful, functional digital products.</p>
+              <div class="code-block">
+                <p class="code-line"><span class="tok">const</span> future = {</p>
+                <p class="code-line">&nbsp;&nbsp;design: <span class="str">"thoughtful"</span>,</p>
+                <p class="code-line">&nbsp;&nbsp;engineering: <span class="str">"reliable"</span>,</p>
+                <p class="code-line">&nbsp;&nbsp;experience: <span class="str">"exceptional"</span></p>
+                <p class="code-line">};</p>
+              </div>
+              <p class="hero-meta" id="hero-tech">HTML · CSS · JavaScript · Angular · Python · Django · REST APIs</p>
+            </div>
+          </article>
+
+          <article class="hero-scene" data-scene="photographer" data-start="0.35" data-end="0.55" data-n="3" aria-hidden="true">
+            <div class="frame-corners" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+            <div class="hero-copy hero-copy--right">
+              <div class="aperture" aria-hidden="true"><span></span></div>
+              <p class="hero-eyebrow">Photographer</p>
+              <h2 class="hero-title">
+                <span class="mask"><span>Every frame</span></span>
+                <span class="mask"><span>tells a story.</span></span>
+              </h2>
+              <span class="focus-line" aria-hidden="true"></span>
+              <p class="hero-description">Finding the right light, perspective, and detail to turn a moment into a visual experience.</p>
+              <ul class="photo-labels">
+                <li>Light</li>
+                <li>Frame</li>
+                <li>Story</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="hero-scene" data-scene="model" data-start="0.55" data-end="0.75" data-n="4" aria-hidden="true">
+            <div class="hero-copy hero-copy--left">
+              <p class="hero-eyebrow">Model</p>
+              <h2 class="hero-title">
+                <span class="mask"><span>Presence.</span></span>
+                <span class="mask"><span>Without noise.</span></span>
+              </h2>
+              <span class="draw-line" aria-hidden="true"></span>
+              <p class="hero-description">Style, confidence, and individuality — expressed through every frame.</p>
+            </div>
+          </article>
+
+          <article class="hero-scene" data-scene="signature" data-start="0.75" data-end="1" data-n="5" aria-hidden="true">
+            <div class="hero-copy hero-copy--signature">
+              <p class="hero-eyebrow">Signature</p>
+              <h2 class="hero-title">
+                <span class="mask"><span>One mind.</span></span>
+                <span class="mask"><span>Three disciplines.</span></span>
+              </h2>
+              <ul class="signature-list">
+                <li data-at="0.80">Software developer</li>
+                <li data-at="0.86">Photographer</li>
+                <li data-at="0.92">Model</li>
+              </ul>
+              <p class="hero-statement" data-at="0.95">Creating with purpose.</p>
+            </div>
+          </article>
+
+          <p class="scroll-hint"><b aria-hidden="true"></b> Scroll</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="section about">
+      <div class="about__layout">
+        <div class="reveal">
+          <p class="eyebrow">About</p>
+          <h2>Beyond the frame.</h2>
+        </div>
+        <div class="about__copy reveal">
+          <span class="about__mark" aria-hidden="true"></span>
+          <p>I'm Ashokan — a software developer and creative professional interested in building digital experiences and exploring visual storytelling.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills" class="section skills">
+      <div class="section__head reveal">
+        <p class="eyebrow">Skills</p>
+        <h2>What I work with.</h2>
+      </div>
+      <div id="skills-root"></div>
+    </section>
+
+    <section id="projects" class="section projects">
+      <div class="section__head reveal">
+        <p class="eyebrow">Projects</p>
+        <h2>Selected projects.</h2>
+        <p class="lede">These cards are placeholders for real work. They do not represent client projects.</p>
+      </div>
+      <div id="projects-root"></div>
+    </section>
+
+    <section id="photography" class="section gallery-section">
+      <div class="section__head reveal">
+        <p class="eyebrow">Photography</p>
+        <h2>Light, frame, story.</h2>
+        <p class="lede">A gallery for photographs. The frames below are placeholders, not published work.</p>
+      </div>
+      <div id="gallery-root" class="gallery"></div>
+    </section>
+
+    <section id="model" class="section model">
+      <div class="section__head reveal">
+        <p class="eyebrow">Model</p>
+        <h2>Presence.</h2>
+        <p class="lede">Stills from the introduction film. Replace them with selected portraits when you have a set to show.</p>
+      </div>
+      <div id="model-root"></div>
+    </section>
+
+    <section id="contact" class="section contact">
+      <div class="contact__layout">
+        <div class="reveal">
+          <p class="eyebrow">Contact</p>
+          <h2>Let's create something.</h2>
+          <ul id="contact-links" class="contact-links"></ul>
+        </div>
+        <form id="contact-form" class="contact-form reveal" novalidate>
+          <div class="field">
+            <label for="contact-name">Name</label>
+            <input id="contact-name" name="name" type="text" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="contact-from">Your email</label>
+            <input id="contact-from" name="email" type="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="contact-message">Message</label>
+            <textarea id="contact-message" name="message" rows="4" required></textarea>
+          </div>
+          <button class="send" type="submit">Open in email</button>
+          <p id="form-note" class="form-note"></p>
+          <p id="form-status" class="form-status" role="status"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>Ashokan</span>
+    <span>Software developer, photographer, and model</span>
+  </footer>
+
+  <dialog id="lightbox" aria-label="Image viewer">
+    <div class="lightbox__bar">
+      <p class="lightbox__count"></p>
+      <button type="button" class="lightbox__close" data-close>Close</button>
+    </div>
+    <div class="lightbox__stage">
+      <button type="button" class="lightbox__nav" data-prev aria-label="Previous image">Prev</button>
+      <div class="lightbox__frame"></div>
+      <button type="button" class="lightbox__nav" data-next aria-label="Next image">Next</button>
+    </div>
+    <p class="lightbox__caption"></p>
+  </dialog>
+
+  <noscript>
+    <p class="noscript-note">JavaScript is disabled, so the film will not follow the scroll and the skill, project, and gallery lists stay empty. The introduction text above is still readable.</p>
+  </noscript>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+  <script src="script.js" defer></script>
+</body>
+</html>
