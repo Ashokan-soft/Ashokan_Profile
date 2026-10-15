@@ -22,13 +22,14 @@
       --frame: 1240px;
       --pad: clamp(1.15rem, 3.5vw, 2.25rem);
       --nav: 72px;
-      --section: clamp(4.5rem, 10vh, 8rem);
+      --section: clamp(3.25rem, 7vh, 5.5rem);
       --ease: cubic-bezier(0.22, 1, 0.36, 1);
       --fast: 220ms;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
     html { overflow-x: clip; }
+    body.menu-open { overflow: hidden; }
     body {
       margin: 0;
       background: var(--bg);
@@ -132,7 +133,8 @@
     .site-nav {
       position: fixed;
       inset: 0 0 auto 0;
-      z-index: 30;
+      z-index: 40;
+      transform: none !important;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -303,16 +305,24 @@
     .about { background: var(--bg); }
     .about-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
-      gap: clamp(2rem, 5vw, 5rem);
-      align-items: end;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: clamp(1.5rem, 4vw, 3.5rem);
+      align-items: center;
     }
+    .about-copy { min-width: 0; }
     .about-visual {
       margin: 0;
       background: var(--surface);
       border: 1px solid var(--line);
+      overflow: hidden;
     }
-    .about-visual img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: center 18%; }
+    .about-visual img {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      object-position: center 22%;
+    }
     .about-visual figcaption {
       padding: 0.75rem 0.9rem;
       color: var(--muted);
@@ -324,7 +334,7 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 1rem;
-      margin-top: clamp(2rem, 5vh, 3.5rem);
+      margin-top: clamp(1.5rem, 4vh, 2.5rem);
       padding-top: 1.5rem;
       border-top: 1px solid var(--line);
     }
@@ -459,28 +469,27 @@
     .projects { background: var(--bg); }
     .project {
       display: grid;
-      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-      gap: clamp(1.25rem, 3vw, 3rem);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: clamp(1.25rem, 3vw, 2.5rem);
       align-items: center;
-      padding: clamp(1.8rem, 4vh, 3rem) 0;
+      padding: clamp(1.5rem, 3.5vh, 2.4rem) 0;
       border-top: 1px solid var(--line);
-      transition: transform var(--fast) var(--ease);
     }
     .project.is-reverse .project-copy { order: 2; }
-    .project:hover { transform: translateY(-4px); }
     .project-media {
       overflow: hidden;
       background: var(--surface);
       border: 1px solid var(--line);
-      min-height: 280px;
+      min-width: 0;
     }
     .project-media img, .ph {
       width: 100%;
-      height: 100%;
-      min-height: 320px;
+      aspect-ratio: 16 / 10;
       object-fit: cover;
-      transition: transform 400ms var(--ease);
+      object-position: center center;
+      transition: transform 500ms var(--ease);
     }
+    .project-media img.is-right { object-position: 72% center; }
     .project:hover .project-media img { transform: scale(1.04); }
     .project-copy h3 {
       margin: 0.35rem 0 0.8rem;
@@ -513,7 +522,7 @@
     .project-links a:hover { border-bottom-color: var(--accent); }
     .project-note { margin-top: 0.8rem; color: var(--muted); font-size: 0.85rem; }
     .project--wide { grid-template-columns: 1fr; }
-    .project--wide .project-media { min-height: 42vh; }
+    .project--wide .project-media img { aspect-ratio: 16 / 8; object-position: 68% center; }
     .project--wide .project-copy { max-width: 46rem; }
     .ph {
       display: flex;
@@ -597,7 +606,14 @@
       background: var(--surface);
       border: 1px solid var(--line);
     }
-    .panel img { width: 100%; height: 100%; min-height: 360px; object-fit: cover; object-position: center 20%; }
+    .panel img {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      object-position: center 18%;
+    }
+    .panel { min-height: 0; }
     .panel-copy {
       position: absolute;
       left: 0;
@@ -624,17 +640,25 @@
       border-top: 1px solid var(--accent);
     }
     .contact-links { margin-top: 1.6rem; }
-    .contact-links a, .contact-links span {
+    .contact-links a, .contact-links > li > span {
       display: flex;
       justify-content: space-between;
+      align-items: baseline;
       gap: 1rem;
       padding: 0.85rem 0;
       border-bottom: 1px solid var(--line);
       font-size: 0.85rem;
       letter-spacing: 0.08em;
       text-transform: uppercase;
+      min-width: 0;
     }
-    .contact-links small { color: var(--muted); letter-spacing: 0; text-transform: none; }
+    .contact-links small {
+      color: var(--muted);
+      letter-spacing: 0;
+      text-transform: none;
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
     .contact-form { display: grid; gap: 0.9rem; }
     .field { display: grid; gap: 0.3rem; }
     .field label { color: var(--muted); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; }
@@ -670,25 +694,53 @@
     .to-top:hover { color: var(--accent); }
     .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
+    @media (max-width: 1100px) {
+      .hero-copy {
+        width: min(36rem, calc(100% - var(--pad) * 2));
+        margin-left: var(--pad);
+        margin-right: var(--pad);
+      }
+      .hero-shade {
+        background: linear-gradient(to top, rgba(7, 7, 6, 0.92) 0%, rgba(7, 7, 6, 0.5) 46%, rgba(7, 7, 6, 0.12) 72%);
+      }
+      .about-grid, .project, .project.is-reverse, .project--wide {
+        grid-template-columns: 1fr;
+      }
+      .project.is-reverse .project-copy { order: 0; }
+      .project-media { order: -1; }
+      .process-list { grid-template-columns: 1fr 1fr; gap: 1.5rem 1.25rem; }
+      .reel-copy { width: min(22rem, 46%); }
+    }
+
     @media (max-width: 900px) {
-      .nav-toggle { display: block; }
+      .nav-toggle { display: block; margin-left: auto; }
+      #site-menu { position: absolute; width: 0; height: 0; }
       .nav-links {
         position: fixed;
         inset: 0;
         z-index: 1;
         display: flex;
         flex-direction: column;
+        align-items: center;
         justify-content: center;
-        gap: 0.35rem;
-        padding: calc(var(--nav) + 1rem) var(--pad);
-        background: rgba(7, 7, 6, 0.97);
-        transform: translateY(-102%);
-        transition: transform 0.4s var(--ease);
+        text-align: center;
+        gap: 0.15rem;
+        width: 100%;
+        height: 100dvh;
+        margin: 0;
+        padding: calc(var(--nav) + 1.5rem) var(--pad) 2rem;
+        background: #070706;
+        visibility: hidden;
+        opacity: 0;
+        transform: none;
+        transition: opacity 0.28s var(--ease), visibility 0.28s var(--ease);
         pointer-events: none;
+        overflow: auto;
       }
-      .nav-links.is-open { transform: none; pointer-events: auto; }
-      .nav-links a { font-size: 1.2rem; }
-      .hero-copy { width: auto; max-width: none; margin: 0; padding: 0 var(--pad) 1.4rem; }
+      .nav-links.is-open { visibility: visible; opacity: 1; pointer-events: auto; }
+      .nav-links a { justify-content: center; font-size: clamp(1.35rem, 6vw, 1.7rem); letter-spacing: 0.12em; }
+      .hero-video { object-position: 70% 18%; }
+      .hero-copy { width: auto; max-width: none; margin: 0; padding: 0 var(--pad) 1.5rem; }
       .hero-shade {
         background: linear-gradient(to top, rgba(7, 7, 6, 0.94) 0%, rgba(7, 7, 6, 0.55) 42%, rgba(7, 7, 6, 0.15) 70%);
       }
@@ -706,9 +758,14 @@
         padding: 1.25rem var(--pad) calc(1.1rem + env(safe-area-inset-bottom));
       }
       .reel-copy h2 { font-size: clamp(1.7rem, 8vw, 2.4rem); }
-      .about-grid, .contact-grid, .creative-grid, .skill-group, .project, .project.is-reverse, .principles, .process-list {
+      .about-grid, .contact-grid, .creative-grid, .skill-group, .project, .project.is-reverse, .project--wide, .principles, .process-list {
         grid-template-columns: 1fr;
       }
+      .about-visual img, .panel img, .project-media img, .project--wide .project-media img {
+        height: auto;
+        aspect-ratio: 16 / 10;
+      }
+      .panel { min-height: 0; }
       .project.is-reverse .project-copy { order: 0; }
       .project-media { order: -1; }
       .section-title, .hero-title, .contact h2 { max-width: none; }
@@ -721,7 +778,9 @@
     @media (max-width: 640px) {
       .hero-title { font-size: clamp(2.15rem, 10vw, 3rem); }
       .section-title { font-size: clamp(1.85rem, 8vw, 2.5rem); }
-      .hero-actions .button { width: 100%; }
+      .hero-actions .button { flex: 1 1 100%; }
+      .contact-links a, .contact-links > li > span { align-items: flex-start; }
+      .contact-links small { text-align: left; }
       .site-footer { flex-direction: column; align-items: flex-start; }
       .project:hover { transform: none; }
     }
@@ -797,15 +856,15 @@
     <section class="section about" id="about">
       <div class="container">
         <div class="about-grid">
-          <div>
+          <div class="about-copy">
             <p class="section-label">01 / About</p>
             <h2 class="section-title">Engineering ideas into reality.</h2>
             <p class="section-description">I'm Ashokan, a software developer focused on building modern web experiences, connecting frontend interfaces with backend services, and turning complex requirements into practical applications.</p>
             <p class="section-description">My approach combines clean implementation, thoughtful UI, reliable API integration, and attention to the details that make products easier to use.</p>
           </div>
           <figure class="about-visual">
-            <img src="assets/stills/introduction-03.jpg" alt="Ashokan in a crimson jacket, a still from the introduction film" width="1600" height="900">
-            <figcaption>Still from the introduction film</figcaption>
+            <img src="assets/cards/about-workspace.jpg" alt="A dark studio desk with two monitors, a stand-in image" width="1600" height="900">
+            <figcaption>Stand-in image. Replace with your own photo.</figcaption>
           </figure>
         </div>
         <div class="principles">
@@ -910,20 +969,17 @@
         </header>
         <div class="creative-grid">
           <article class="panel">
-            <div class="ph" style="min-height:360px">
-              <strong>Photography</strong>
-              <span>Replace this frame with a photograph. Nothing here is published client work.</span>
-            </div>
+            <img src="assets/cards/photo.jpg" alt="A camera on a tripod in a dark studio, a stand-in image" width="1600" height="900">
             <div class="panel-copy">
               <h3>Photography</h3>
               <p>Light, composition, and visual storytelling.</p>
             </div>
           </article>
           <article class="panel">
-            <img src="assets/stills/model-studio.jpg" alt="Ashokan in a studio, a still from the introduction film" width="1600" height="900">
+            <img src="assets/cards/style.jpg" alt="A black jacket on a stand, a stand-in image" width="1600" height="900">
             <div class="panel-copy">
               <h3>Model</h3>
-              <p>Style, presence, and self-expression. Still from the introduction film.</p>
+              <p>Style, presence, and self-expression. Stand-in image until a real photo is added.</p>
             </div>
           </article>
         </div>
@@ -985,7 +1041,7 @@
           problem: "Placeholder. Replace this with the problem a real interface needed to solve.",
           solution: "A space for an Angular application. This card does not represent shipped client work.",
           stack: ["Angular", "TypeScript", "HTML", "CSS"],
-          image: "",
+          image: "assets/cards/angular.jpg",
           demo: "",
           code: "",
           wide: false
@@ -995,7 +1051,7 @@
           problem: "Placeholder. Describe the data or workflow the API needed to support.",
           solution: "A space for a Django and Django REST Framework project. No repository is linked yet.",
           stack: ["Python", "Django", "Django REST Framework"],
-          image: "",
+          image: "assets/cards/api.jpg",
           demo: "",
           code: "",
           wide: false
@@ -1005,7 +1061,7 @@
           problem: "Placeholder for a wider build such as a dashboard, shop, auth flow, or internal tool.",
           solution: "Add the real screenshot, problem, and links here when the work is ready to show.",
           stack: ["JavaScript", "REST APIs", "PostgreSQL"],
-          image: "",
+          image: "assets/cards/dashboard.jpg",
           demo: "",
           code: "",
           wide: true
@@ -1060,8 +1116,9 @@
         if (image) {
           const img = document.createElement("img");
           img.src = image;
-          img.alt = project.title;
+          img.alt = `${project.title}, a stand-in image`;
           img.loading = "lazy";
+          if (project.wide) img.className = "is-right";
           media.appendChild(img);
         } else {
           media.innerHTML = `<div class="ph"><strong>Placeholder</strong><span>Add a project screenshot</span></div>`;
@@ -1125,6 +1182,7 @@
       const setOpen = (open) => {
         toggle.setAttribute("aria-expanded", open ? "true" : "false");
         links.classList.toggle("is-open", open);
+        document.body.classList.toggle("menu-open", open);
       };
       toggle.addEventListener("click", () => setOpen(toggle.getAttribute("aria-expanded") !== "true"));
       anchors.forEach((anchor) => anchor.addEventListener("click", () => setOpen(false)));
@@ -1394,39 +1452,31 @@
 
         const hero = gsap.timeline({ defaults: { ease: "power3.out" } });
         hero
-          .from(".site-nav", { autoAlpha: 0, y: -16, duration: 0.6 })
+          .from(".site-nav", { autoAlpha: 0, duration: 0.5, clearProps: "transform" })
           .from(".hero-eyebrow", { autoAlpha: 0, y: 14, duration: 0.5 }, "-=0.25")
           .from(".hero-title .line span", { yPercent: 110, duration: 0.8, stagger: 0.12 }, "-=0.2")
           .from(".hero-lead", { autoAlpha: 0, y: 16, duration: 0.55 }, "-=0.35")
           .from(".hero-actions .button", { autoAlpha: 0, y: 12, duration: 0.4, stagger: 0.08 }, "-=0.25")
           .from(".hero-meta", { autoAlpha: 0, duration: 0.4 }, "-=0.15");
 
-        gsap.utils.toArray(".section-title, .section-description, .principles article, .stage").forEach((node, index) => {
+        gsap.utils.toArray(".section-title, .section-description, .principles article, .stage, .about-visual, .panel").forEach((node) => {
           gsap.from(node, {
-            y: 28,
+            y: 22,
             autoAlpha: 0,
-            duration: 0.75,
-            delay: (index % 4) * 0.05,
-            scrollTrigger: { trigger: node, start: "top 88%" }
+            duration: 0.7,
+            immediateRender: false,
+            scrollTrigger: { trigger: node, start: "top 92%", once: true }
           });
         });
 
         gsap.utils.toArray(".skill").forEach((node, index) => {
           gsap.from(node, {
-            y: 16,
+            y: 12,
             autoAlpha: 0,
-            duration: 0.45,
-            delay: (index % 6) * 0.04,
-            scrollTrigger: { trigger: node, start: "top 92%" }
-          });
-        });
-
-        gsap.utils.toArray(".project-media").forEach((node) => {
-          gsap.from(node, {
-            clipPath: "inset(10% 8% 10% 8%)",
-            duration: 0.9,
-            ease: "power2.out",
-            scrollTrigger: { trigger: node, start: "top 84%" }
+            duration: 0.4,
+            delay: (index % 6) * 0.03,
+            immediateRender: false,
+            scrollTrigger: { trigger: node, start: "top 94%", once: true }
           });
         });
 
@@ -1438,20 +1488,11 @@
         });
 
         gsap.from(".contact-grid", {
-          y: 24,
+          y: 20,
           autoAlpha: 0,
-          duration: 0.8,
-          scrollTrigger: { trigger: ".contact", start: "top 82%" }
-        });
-
-        mm.add("(min-width: 901px)", () => {
-          gsap.utils.toArray(".project-media img, .about-visual img, .panel img").forEach((image) => {
-            gsap.fromTo(image, { yPercent: -4 }, {
-              yPercent: 4,
-              ease: "none",
-              scrollTrigger: { trigger: image.parentElement, start: "top bottom", end: "bottom top", scrub: true }
-            });
-          });
+          duration: 0.7,
+          immediateRender: false,
+          scrollTrigger: { trigger: ".contact", start: "top 88%", once: true }
         });
 
         return () => {
